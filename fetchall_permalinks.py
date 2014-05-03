@@ -24,7 +24,7 @@ def main():
 
     if 'financial-organizations.json' not in os.listdir("./data/"):
         try:
-            with open('financial-organizations.json', 'wb') as f:
+            with open('./data/financial-organizations.json', 'wb') as f:
                 data = api.all_financial_orgs()
                 json.dump(data, f)
         except:
@@ -33,7 +33,7 @@ def main():
 
     if 'companies.json' not in os.listdir("./data/"):
         try:
-            with open('companies.json', 'wb') as f:
+            with open('./data/companies.json', 'wb') as f:
                 data = api.all_companies()
                 json.dump(data, f)
         except:
