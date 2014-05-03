@@ -38,6 +38,8 @@ def save_to_file(data, dirname, permalink):
     with open(outfile, 'wb') as f:
         json.dump(data, f)
 
+loginfo = open('info.log', 'wb')
+
 logcsv = open('fetchall_details.log.csv', 'wb')
 logwriter = csv.writer(logcsv)
 logwriter.writerow(['entity_type', 'permalink', 'success?'])
@@ -45,7 +47,9 @@ logwriter.writerow(['entity_type', 'permalink', 'success?'])
 api = setup_api()
 
 for entity_type in ['financial-organizations', 'companies']:
+    loginfo.write("processing {}\n".format(entity_type))
     for i, permalink in enumerate(get_permalinks(entity_type)):
+        loginfo.write("permalink #{} => {}\n".format(i, permalink))
         if entity_type == 'companies':
             try:
                 res = api.company(permalink)
@@ -62,8 +66,7 @@ for entity_type in ['financial-organizations', 'companies']:
         else:
             logwriter.writerow([entity_type, permalink, True])
             save_to_file(res, entity_type, permalink)
-        if i == 10:
-            break
 
 logcsv.close()
+loginfo.close()
 
