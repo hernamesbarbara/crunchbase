@@ -19,7 +19,7 @@ counter = 0
 total = db.permalinks.count()
 for doc in db.permalinks.find({}):
     counter += 1
-    if counter % 100 == 0:
+    if counter % 50 == 0:
         print "Permalink {} of {}".format(counter, total)
     if db['entities'].find_one({'permalink': doc['permalink']}):
         continue
@@ -27,7 +27,9 @@ for doc in db.permalinks.find({}):
         details = api.company(doc['permalink'])
     if doc['entity_type'] == 'financial_organization':
         details = api.financial_org(doc['permalink'])
-    db['entities'].insert(details)
+    if details is None:
+        print 'Details was null for ', doc
+        db['entities'].save(details)
 
 
 
