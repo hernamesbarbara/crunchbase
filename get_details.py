@@ -14,7 +14,6 @@ MONGO_URI = os.environ.get('MONGO_URI', 'mongodb://localhost:27017/crunchbase')
 db = MongoClient(MONGO_URI)['crunchbase']
 api = Crunchbase(os.environ['CRUNCHBASE_APIKEY'])
 
-
 counter = 0
 total = db.permalinks.count()
 for doc in db.permalinks.find({}):
@@ -30,6 +29,7 @@ for doc in db.permalinks.find({}):
     if details is None:
         print 'Details was null for ', doc
     else:
+        details['entity_type'] = doc['entity_type']
         db['entities'].save(details)
 
 
