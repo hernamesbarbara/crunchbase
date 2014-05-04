@@ -9,15 +9,18 @@ from crunchbase import Crunchbase
 import ujson as json
 from pymongo import MongoClient
 import datetime
-import time
 
 MONGO_URI = os.environ.get('MONGO_URI', 'mongodb://localhost:27017/crunchbase')
 db = MongoClient(MONGO_URI)['crunchbase']
 api = Crunchbase(os.environ['CRUNCHBASE_APIKEY'])
 
 
-
+counter = 0
+total = db.permalinks.count()
 for doc in db.permalinks.find({}):
+    counter += 1
+    if counter % 100 == 0:
+        print "Permalink {} of {}".format(counter, total)
     if db['entities'].find_one({'permalink': doc['permalink']}):
         continue
     if doc['entity_type'] == 'company':
