@@ -38,11 +38,19 @@ def save_to_file(data, dirname, permalink):
     with open(outfile, 'wb') as f:
         json.dump(data, f)
 
-loginfo = open('info.log', 'wb')
 
-logcsv = open('fetchall_details.log.csv', 'wb')
-logwriter = csv.writer(logcsv)
-logwriter.writerow(['entity_type', 'permalink', 'success?'])
+if os.path.exists("info.log"):
+    loginfo = open('info.log', 'a')
+else:
+    loginfo = open('info.log', 'wb')
+
+if os.path.exists("fetchall_details.log.csv"):
+    logcsv = open('fetchall_details.log.csv', 'a')
+    logwriter = csv.writer(logcsv)
+else:
+    logcsv = open('fetchall_details.log.csv', 'wb')
+    logwriter = csv.writer(logcsv)
+    logwriter.writerow(['entity_type', 'permalink', 'success?'])
 
 api = setup_api()
 
