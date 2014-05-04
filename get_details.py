@@ -29,6 +29,7 @@ for doc in db.permalinks.find({}):
         details = api.financial_org(doc['permalink'])
     if details is None:
         print 'Details was null for ', doc
+    else:
         db['entities'].save(details)
 
 
