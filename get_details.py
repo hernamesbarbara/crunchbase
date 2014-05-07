@@ -16,12 +16,12 @@ api = Crunchbase(os.environ['CRUNCHBASE_APIKEY'])
 
 counter = 0
 total = db.permalinks.count()
-for doc in db.permalinks.find({}):
+for doc in db.permalinks.find({}).batch_size(100):
     counter += 1
     timestamp = datetime.datetime.utcnow()
     if counter % 50 == 0:
         print "{}: Permalink: {} of {}".format(timestamp.isoformat(), counter, total)
-    if db['entities'].find_one({'permalink': doc['permalink']}, timeout=False):
+    if db['entities'].find_one({'permalink': doc['permalink']}):
         continue
     if doc['entity_type'] == 'company':
         details = api.company(doc['permalink'])
