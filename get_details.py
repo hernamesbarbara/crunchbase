@@ -21,7 +21,7 @@ for doc in db.permalinks.find({}):
     timestamp = datetime.datetime.utcnow()
     if counter % 50 == 0:
         print "{}: Permalink: {} of {}".format(timestamp.isoformat(), counter, total)
-    if db['entities'].find_one({'permalink': doc['permalink']}):
+    if db['entities'].find_one({'permalink': doc['permalink']}, timeout=False):
         continue
     if doc['entity_type'] == 'company':
         details = api.company(doc['permalink'])
