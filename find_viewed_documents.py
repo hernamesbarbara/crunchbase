@@ -28,6 +28,13 @@ def already_fetched(record):
 # or (B) have the `seen` key but its value is False
 q = { "$or": [ { "seen": False }, { "seen": {"$exists": False} } ] }
 
+total = db.permalinks.count()
+unprocessed = db.permalinks.find(q).count()
+counter = 0
 for permalink in db.permalinks.find(q).batch_size(100):
+    counter += 1
+    timestamp = datetime.datetime.utcnow()
+    if counter % 25 == 0:
+        print "{}: Permalink: {} of {} unprocessed of {} total".format(timestamp.isoformat(), counter, unprocessed, total)
     if already_fetched(permalink):
         db.permalinks.update({"_id": permalink["_id"]}, {"$set": {"seen": True}}, upsert=False)
