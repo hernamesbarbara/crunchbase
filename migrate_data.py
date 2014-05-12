@@ -21,7 +21,7 @@ for doc in db_old['entities'].find({}).batch_size(100):
     counter += 1
     if counter % 10:
         print "{} of {} done".format(counter, total)
-    exists = db_new['crunchbase'].find_one({"type": "entity", "data.permalink": doc["permalink"]}, {"_id": 1, {"data.entity_type": 1}})
+    exists = db_new['crunchbase'].find_one({"type": "entity", "data.permalink": doc["permalink"]}, {"_id": 1, "data.entity_type": 1})
     if not exists:
         doc.pop("_id")
         record = {
