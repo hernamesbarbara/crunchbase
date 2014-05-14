@@ -27,7 +27,7 @@ for permalink in new_permalinks:
         print "{}: Permalink: {} of {}".format(timestamp.isoformat(), counter, total)
     doc = crunchbase.find_one({"type": "permalink", "data.permalink": permalink})
     if doc is None:
-        print 'Details was null for ', permalink
+        print 'find_one for permalink `{}` was null'.format(permalink)
         continue
     if doc['data']['entity_type'] == 'company':
         details = api.company(doc['data']['permalink'])
@@ -36,8 +36,10 @@ for permalink in new_permalinks:
     if details is None:
         print 'Details was null for ', doc
     else:
-        details['entity_type'] = doc['entity_type']
+        print details
+        details['entity_type'] = doc['data']['entity_type']
         crunchbase.save({"type": "entity", "data": details})
+    break
 
 
 
