@@ -11,27 +11,33 @@ from pymongo import MongoClient
 import datetime
 
 MONGO_URI = os.environ.get('MONGO_URI', 'mongodb://localhost:27017/crunchbase')
-db = MongoClient(MONGO_URI)['crunchbase']
+db = MongoClient(MONGO_URI)['yhat']
+crunchbase = db.crunchbase
 api = Crunchbase(os.environ['CRUNCHBASE_APIKEY'])
 
+seen_permalinks = crunchbase.find({"type": "entity"}).distinct("data.permalink")
+new_permalinks = crunchbase.find({"type": "permalink", "data.permalink": {"$nin": seen_permalinks}}).distinct("data.permalink")
 counter = 0
-total = db.permalinks.count()
-for doc in db.permalinks.find({}).batch_size(100):
+total = len(new_permalinks)
+
+for permalink in new_permalinks:
     counter += 1
     timestamp = datetime.datetime.utcnow()
     if counter % 50 == 0:
         print "{}: Permalink: {} of {}".format(timestamp.isoformat(), counter, total)
-    if db['entities'].find_one({'permalink': doc['permalink']}):
+    doc = crunchbase.find_one({"type": "permalink", "data.permalink": permalink})
+    if doc is None:
+        print 'Details was null for ', permalink
         continue
-    if doc['entity_type'] == 'company':
-        details = api.company(doc['permalink'])
-    if doc['entity_type'] == 'financial_organization':
-        details = api.financial_org(doc['permalink'])
+    if doc['data']['entity_type'] == 'company':
+        details = api.company(doc['data']['permalink'])
+    if doc['data']['entity_type'] == 'financial_organization':
+        details = api.financial_org(doc['data']['permalink'])
     if details is None:
         print 'Details was null for ', doc
     else:
         details['entity_type'] = doc['entity_type']
-        db['entities'].save(details)
+        crunchbase.save({"type": "entity", "data": details})
 
 
 
