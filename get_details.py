@@ -36,7 +36,7 @@ for permalink in new_permalinks:
     if details is None:
         print 'Details was null for ', doc
     else:
-        print details
+        # print details
         details['entity_type'] = doc['data']['entity_type']
         crunchbase.save({"type": "entity", "data": details})
 
