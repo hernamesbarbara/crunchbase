@@ -57,7 +57,7 @@ total = len(seen_permalinks)
 successful = 0
 
 fmt = "{} of {}"
-for doc in records[:10]:
+for doc in records:
     counter += 1
     print log_msg(fmt.format(counter, total))
     if doc['data']['permalink'] not in seen_permalinks:
