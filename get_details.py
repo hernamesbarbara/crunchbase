@@ -39,7 +39,6 @@ for permalink in new_permalinks:
         print details
         details['entity_type'] = doc['data']['entity_type']
         crunchbase.save({"type": "entity", "data": details})
-    break
 
 
 
