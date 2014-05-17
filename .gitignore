@@ -71,3 +71,4 @@ fetchall_details.log.csv
 *.json
 missing_entity_permalinks.csv
 deal_details_list.csv
+company_details_list.csv
