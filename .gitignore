@@ -69,3 +69,4 @@ docs/_build/
 setupenv
 fetchall_details.log.csv
 *.json
+missing_entity_permalinks.csv
