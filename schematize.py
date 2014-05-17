@@ -58,6 +58,7 @@ for doc in db.crunchbase.find({"data.entity_type": "financial_organization"}).ba
         print "{} of {}".format(counter, total)
 
 df = pd.DataFrame(deal_details_list)
+# df.to_csv('deal_details_list.csv', index=False, encoding='utf-8')
 dfsub = df[df.deal_id.isin(df.deal_id.value_counts()[df.deal_id.value_counts() > 1].index)] # get rid of deals that just have 1 investor
 df_wide = pd.pivot_table(dfsub, values=["n"], rows=["financial_organization_name", "deal_id"], aggfunc=np.mean, fill_value=0).unstack()
 df_wide = df_wide.fillna(0)
