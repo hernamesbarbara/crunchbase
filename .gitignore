@@ -70,4 +70,4 @@ setupenv
 fetchall_details.log.csv
 *.json
 missing_entity_permalinks.csv
-deal_detail_list.csv
+deal_details_list.csv
