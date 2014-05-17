@@ -1,0 +1,72 @@
+#!/bin/bash
+
+DBUSER=$1
+DBHOST=$2
+DBNAME=$3
+
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+CMD="-h $DBHOST -d $DBNAME -U $DBUSER"
+
+SQL="SET search_path TO sandbox;
+DROP TABLE IF EXISTS tmp_company_lng;
+CREATE TABLE tmp_company_lng
+(
+    company_n_funding_rounds VARCHAR
+    , company_name VARCHAR
+    , company_permalink VARCHAR
+    , crunchbase_round_id VARCHAR
+    , deal_currency_code VARCHAR
+    , deal_funded_day VARCHAR
+    , deal_funded_month VARCHAR
+    , deal_funded_year VARCHAR
+    , deal_raised_amount VARCHAR
+    , deal_round VARCHAR
+    , participant_name VARCHAR
+    , participant_permalink VARCHAR
+    , participant_type VARCHAR
+ );
+"
+echo -e "$SQL"
+
+psql $CMD -c "$SQL"
+psql $CMD -c "\COPY sandbox.tmp_company_lng FROM '"$DIR"/company_details_list.csv' DELIMITER ',' CSV;"
+
+psql $CMD -c "delete from sandbox.tmp_company_lng where deal_funded_day = 'deal_funded_day';"
+
+SQL="
+    DROP TABLE IF EXISTS sandbox.tmp_company_lng_clean;
+    SELECT
+        company_n_funding_rounds::FLOAT::INT AS n_rounds
+        , company_name
+        , company_permalink
+        , crunchbase_round_id AS cb_deal_id
+        , deal_currency_code
+        , (deal_funded_year::FLOAT::INT || '-' || deal_funded_month::FLOAT::INT || '-' || deal_funded_day::FLOAT::INT)::TIMESTAMP AS deal_date
+        , deal_funded_day::FLOAT::INT AS deal_day
+        , deal_funded_month::FLOAT::INT AS deal_month
+        , deal_funded_year::FLOAT::INT AS deal_year
+        , deal_raised_amount::FLOAT AS deal_amount
+        , deal_round 
+        , participant_name
+        , participant_permalink
+        , participant_type
+    INTO sandbox.tmp_company_lng_clean
+    FROM
+        sandbox.tmp_company_lng ;
+
+DROP TABLE IF EXISTS sandbox.os_cb_deals;
+SELECT
+    * 
+INTO
+    sandbox.os_cb_deals
+FROM
+    sandbox.tmp_company_lng_clean
+ORDER BY
+    company_name
+    , deal_date;
+
+DROP TABLE sandbox.tmp_company_lng;
+DROP TABLE sandbox.tmp_company_lng_clean;
+"
+psql $CMD -c "$SQL"
